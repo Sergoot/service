@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+</head>
+<body>
+{% block profile %}
+
+    <h3>{{profile.user.username}}</h3>
+
+{% if profile.user.email %}
+    <p>Почта: {{profile.user.email}}</p>
+{% endif %}
+
+{% if profile.bio %}
+    <p>{{profile.bio}}</p>
+{% endif %}
+
+{% endblock profile %}
+
+{% block add_training %}
+<h1>ДОБАВИТЬ ТРЕНИРОВКУ</h1>
+<form action="{% url 'new_train' %}" method="post">
+    {% csrf_token %}
+    {{form.title}}<br>
+    {{form.exercises}}
+    <input type="submit" title="Добавить">
+</form>
+{% endblock %}
+
+{% block trainings %}
+    {% for train in trainings %}
+<h3>{{train.title}} {{train.pub_date}} <a href="{% url 'delete_train' train.id %}">DELETE</a></h3>
+    {% endfor %}
+{% endblock %}
+
+{% block edit %}
+<button onclick="document.location='{% url 'account:user_profile_edit' profile.slug %}'">Редактировать профиль</button>
+{% endblock %}
+{% block stats %}
+{% endblock %}
+
+{% block sub %}
+
+{% endblock %}
+
+</body>
+</html>

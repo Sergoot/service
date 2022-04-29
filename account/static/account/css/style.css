@@ -1,0 +1,58 @@
+body{
+  font-family: 'Nunito', sans-serif;
+    margin: 0;
+    width: 100%;
+    background: rgb(128,218,202);
+  background: -webkit-linear-gradient(left, rgba(128,218,202,1) 0%, rgba(210,200,75,1) 100%);
+  background: -o-linear-gradient(left, rgba(128,218,202,1) 0%, rgba(210,200,75,1) 100%);
+  background: linear-gradient(to right, rgba(128,218,202,1) 0%, rgba(210,200,75,1) 100%);
+}
+.profile {
+  width: 600px;
+  margin: 5% 35% 0% 35%;
+  padding: 3% 5% 2% 5%;
+  background: white;
+  box-sizing: border-box;
+  border-radius: 10%;
+  width: 30%;
+}
+.fields{
+  background: black;
+  width: 100%;
+  height: 40%;
+  float: left;
+}
+.btn-wrapper{
+  position: relative;
+}
+.btn:hover{
+  box-shadow: 0 8px 65px -5px black;
+
+}
+.btn{
+  letter-spacing: 1px;
+  font-size: 22px;
+  line-height: 30px;
+  text-transform: uppercase;
+  background-color: rgb(128,218,202);
+  color: black;
+  border: none;
+  border-radius: 10px;
+  min-width: 20%;
+  padding: 0 24px;
+  box-shadow: 0 10px 60px -10px;
+  cursor: pointer;
+  transition: all 5s cubic-bezier(0.03, 0.98, 0.52, 0.99);
+  outline: none;
+  margin: auto;
+  position: relative;
+  left: 50%;
+  transform: translate(-50%, 0);
+  margin-top: 5%
+}
+.form-control{
+  border-radius: 20px;
+}
+.form-check-input{
+  border-radius: 20px;
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+
+{% load crispy_forms_tags %}
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    {% block static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'games/css/navbar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'account/css/registration.css' %}">
+    {% endblock %}
+
+</head>
+<body>
+<div class="register">
+<h1>Создание аккаунта</h1>
+    <p>Пожалуйста, зарегистрируйтесь, используя данную форму.</p>
+    <form class="register-form" action="." method="post">
+        {{ user_form|crispy }}
+        {% csrf_token %}
+        <p><button id="btn-add-acc" type="submit" class="btn btn-outline-info btn-lg">Создать аккаунт</button></p>
+    </form>
+</div>
+</body>
+</html>

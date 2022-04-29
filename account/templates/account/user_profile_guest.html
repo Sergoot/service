@@ -1,0 +1,27 @@
+{% extends 'account/user_profile.html' %}
+
+
+{% block add_training %}
+
+{% endblock %}
+
+{% block sub %}
+{% if profile.followers.all %}
+    {% for subscriber in profile.followers.all %}
+
+        {% if request.user == subscriber %}
+            <h3>Вы подписаны</h3>
+<a href="{% url 'account:unsubscribe' request.user.id profile.user.id %}">Отписаться</a>
+        {% endif %}
+
+    {% endfor %}
+
+{% else %}
+            <h1><a href="{% url 'account:subscribe' request.user.id profile.user.id %}">Подписаться</a></h1>
+{% endif %}
+{% endblock %}
+
+{% block edit %}
+
+{% endblock %}
+

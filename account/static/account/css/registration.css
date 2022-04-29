@@ -1,0 +1,27 @@
+.register{
+    width: 80vw;
+    margin-left: 10vw;
+    margin-right: 10vw;
+    margin-top: 10vh;
+}
+#btn-add-acc{
+    margin-top: 5vh;
+    color: #1E90FF;
+    border-color: #1E90FF;
+}
+#btn-add-acc:hover{
+    background-color: #1E90FF;
+    color: white;
+}
+.reg-done{
+    width: 80vw;
+    margin-left: 10vw;
+    margin-right: 10vw;
+    margin-top: 10vh;
+}
+#btn-exit{
+    margin-top: 5vh;
+    color: #1E90FF;
+    border-color: #1E90FF;
+}
+

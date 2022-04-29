@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% block static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'games/css/navbar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'account/css/registration.css' %}">
+    {% endblock %}
+</head>
+<body>
+<div class="reg-done">
+<h1>Welcome {{ new_user.first_name }}!</h1>
+<p><font size="10" face="sans-serif">Your account has been successfully created. Now you can <a href="{% url 'account:login' %}">log in</a>.</font></p>
+</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends 'account/user_profile.html' %}
+
+{% block edit %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{user_form.username}}
+    {{user_form.email}}
+    {{profile_form.bio}}
+    <button type="submit">Сохранить</button>
+</form>
+{% endblock %}
+
+{% block add_training %}
+
+{% endblock %}
