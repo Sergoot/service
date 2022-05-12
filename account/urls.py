@@ -1,6 +1,6 @@
 from django.urls import path, include
 from . import views
-from .views import ShowProfilePageView
+
 from .views import EditProfile
 app_name = 'account'
 urlpatterns = [

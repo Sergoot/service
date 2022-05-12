@@ -4,14 +4,16 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView, UpdateView, CreateView
 
-from main.forms import TrainingForm
+from main.forms import TrainingForm, ExerciseForm
 from main.models import Exercise, Training
 from .forms import LoginForm, UserRegistrationForm, ProfileEdit, UserEdit
 from django.contrib.auth import logout
 from main import views as vmain
 from .models import Profile
+from .tasks import send_greetings_email
+from .service import mail, get_profile_context, create_exercise_form_save
 
 
 def logout_view(request):
@@ -44,10 +46,14 @@ def register(request):
         if user_form.is_valid():
             #создание нового пользователя
             new_user = user_form.save(commit=False)
+            # mail(new_user.email)
+            # send_greetings_email.delay(new_user.email)
+            print(new_user.email)
             #Сохранение пароля
             new_user.set_password(user_form.cleaned_data['password'])
             # Сохранение нового пользователя
             new_user.save()
+
             #Создание профиля нового пользователя
             profile = Profile()
             profile.user = new_user
@@ -58,25 +64,47 @@ def register(request):
     return render(request, 'account/1index.html', {'user_form': user_form})
 
 
-class ShowProfilePageView(DetailView):
-    template_name = 'account/user_profile.html'
-    model = ''
+# class ShowProfilePageView(DetailView):
+#     template_name = 'account/user_profile.html'
+#     model = ''
+#
+#     def get_context_data(self, *args, **kwargs):
+#         # context = super(ShowProfilePageView, self).get_context_data(*args, **kwargs)
+#         return Profile.objects.get(slug=self.kwargs.get('slug'))
+#         # page_user = get_object_or_404(Profile, slug=self.kwargs['profile_slug'])
+#         # context['page_user'] = page_user
+#         # return context
 
-    def get_context_data(self, *args, **kwargs):
-        # context = super(ShowProfilePageView, self).get_context_data(*args, **kwargs)
-        return Profile.objects.get(slug=self.kwargs.get('slug'))
-        # page_user = get_object_or_404(Profile, slug=self.kwargs['profile_slug'])
-        # context['page_user'] = page_user
-        # return context
+
+# class ProfileView(DetailView):
+#     model = Profile
+#     template_name = 'account/user_profile.html'
+#
+#     def get_context_data(self, *args, **kwargs):
+#
+#         context = super(ProfileView, self).get_context_data(**kwargs)
+#         context['profile']= get_object_or_404(self.model, slug=kwargs.get('profile_slug'))
+#         context['']
+#         return
+#
+#     def post(self,request,*args,**kwargs):
+#         create_exercise_form = ExerciseForm(request.POST)
+#         if create_exercise_form.is_valid():
+#             create_exercise_form.save()
+#         return self.get_context_data()
 
 
 def profile(request, profile_slug):
-    profile = get_object_or_404(Profile, slug=profile_slug)
-    trainings = Training.objects.filter(user=request.user).order_by('-pub_date')[:5]
-    form = TrainingForm(user=request.user)
+    context = get_profile_context(request, profile_slug)
+
+    if request.method == 'POST':
+        create_exercise_form_save(request.POST)
+        return render(request, 'account/user_profile.html', context)
+
     if request.user.username != profile_slug:
-        return render(request, 'account/user_profile_guest.html', {'profile': profile})
-    return render(request, 'account/user_profile.html', {'profile': profile, 'form': form, 'trainings': trainings})
+        return render(request, 'account/user_profile_guest.html', context)
+
+    return render(request, 'account/user_profile.html', context)
 
 
 class EditProfile(UpdateView):
@@ -84,22 +112,27 @@ class EditProfile(UpdateView):
     template_name = 'account/user_profile_edit.html'
     slug_url_kwarg = 'profile_slug'
     form_class = ProfileEdit
-    second_form_class = UserEdit
 
     def get(self, request, *args, **kwargs):
-        user_profile = get_object_or_404(Profile, user=request.user)
-        profile_form = self.form_class(instance=user_profile)
-        user_form = self.second_form_class(instance=request.user)
-        return render(request, self.template_name, {'profile_form': profile_form,'user_form':user_form, 'profile': user_profile})
-
+        user_profile = get_object_or_404(self.model, user=request.user)
+        user_form = self.form_class(data={
+                                          'username': user_profile.user.username,
+                                          'email': user_profile.user.email,
+                                          'bio': user_profile.bio,
+                                         }
+                                    )
+        user_form.email = request.user.email
+        return render(request, self.template_name, {'profile_form': user_form, 'profile': user_profile})
 
     def form_valid(self, form):
-        user_profile = form.save(commit=False)
-        user_profile.user.username = self.request.POST['username']
-        user_profile.user.email = self.request.POST['email']
-        user_profile.user.save()
-        user_profile.save()
-        return redirect(f'/account/{user_profile}')
+
+        self.object = form.save(commit=False)
+        self.object.refresh_from_db()
+        self.object.user.username = form.cleaned_data['username']
+        self.object.user.email = form.cleaned_data['email']
+        self.object.user.save()
+        self.object.save()
+        return redirect(f'/account/{self.object.user.username}')
 
 
 def subscribe(request, subscriber_id, user_id):

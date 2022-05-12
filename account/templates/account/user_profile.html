@@ -1,9 +1,13 @@
 <!DOCTYPE html>
+{% include 'main/navbar.html' %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </head>
 <body>
 {% block profile %}
@@ -21,18 +25,88 @@
 {% endblock profile %}
 
 {% block add_training %}
-<h1>ДОБАВИТЬ ТРЕНИРОВКУ</h1>
-<form action="{% url 'new_train' %}" method="post">
-    {% csrf_token %}
-    {{form.title}}<br>
-    {{form.exercises}}
-    <input type="submit" title="Добавить">
+<!--<h1>ДОБАВИТЬ ТРЕНИРОВКУ</h1>-->
+<!--<form  class="TRAINING" action="{% url 'new_train' %}" method="post">-->
+<!--    {% csrf_token %}-->
+<!--    {{training_form.title}}<br>-->
+<!--    {{training_form.private_exercises}}-->
+<!--    {{training_form.public_exercises}}-->
+<!--    <input type="submit" value="Добавить">-->
+    <div class="modal fade" id="ExerciseChoice" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <form action="{% url 'new_train' %}" method="post">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+              {% csrf_token %}
+              {{training_form.title}}
+              <nav>
+  <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Свои упражнения</button>
+    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Все упражнения</button>
+  </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+  <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">{{training_form.private_exercises}}</div>
+  <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">{{training_form.public_exercises}}</div>
+</div>
+
+
+      </div>
+
+      <div class="modal-footer">
+          <input type="submit" value="Добавить">
+          <button type="button"  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#NewExercise">
+  Новое Упражнение
+</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+      </form>
+  </div>
+</div>
+    <button type="button"  class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ExerciseChoice">
+  Добавить Тренировку
+</button>
+
+
 </form>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="NewExercise" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form action="{% url 'exercise_create' %}" method="post">
+              {% csrf_token %}
+              {{exercise_form}}
+              <input type="submit" value="Создать">
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block trainings %}
     {% for train in trainings %}
 <h3>{{train.title}} {{train.pub_date}} <a href="{% url 'delete_train' train.id %}">DELETE</a></h3>
+        {% for exercise in train.exercises.all %}
+            <h5>{{exercise}}</h5>
+        {% endfor %}
     {% endfor %}
 {% endblock %}
 
@@ -43,8 +117,13 @@
 {% endblock %}
 
 {% block sub %}
-
+{% block semisub %}
 {% endblock %}
+{% endblock %}
+<br>
+{% for exercise in request.user.exercises.all %}
+    {{exercise}}<br>
+{% endfor %}
 
 </body>
 </html>

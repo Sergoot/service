@@ -11,25 +11,25 @@ MUSCLE_CATEGORY_CHOICES = [
 
 
 class Exercise(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE, related_name='exercises')
     title = models.CharField(max_length=255)
     weight = models.SmallIntegerField()
     approaches = models.SmallIntegerField()
     repetition = models.SmallIntegerField()
-    muscle_category = models.CharField(choices=MUSCLE_CATEGORY_CHOICES,max_length=255)
+    muscle_category = models.CharField(choices=MUSCLE_CATEGORY_CHOICES, max_length=255)
+    is_private = models.BooleanField('Приватное',)
 
-    def __str__(self):
-        return self.title
+    def __str__(self) -> str:
+        return f'{self.title} {self.weight}кг - {self.approaches} по {self.repetition}({self.is_private})'
 
-    def __int__(self):
-        return self.id
+
 
 class Training(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     pub_date = models.DateTimeField(default=timezone.now)
     user_mark = models.SmallIntegerField(null=True)
-    exercises = models.ManyToManyField(Exercise, related_name='trainings')
+    exercises = models.ManyToManyField(Exercise, related_name='trainings', null=True, blank=True)
 
 
     def __str__(self):

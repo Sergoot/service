@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-{% load crispy_forms_tags %}
+
 {% load static %}
 <html lang="en">
 <head>
@@ -16,8 +16,8 @@
 <h1>Вход в аккаунт</h1>
     <p>Пожалуйста, войдите в аккаунт, используя данную форму.</p>
 <form action="." method="post">
-        {{ form.username|as_crispy_field }}
-        {{ form.password|as_crispy_field }}
+        {{ form.username }}
+        {{ form.password }}
         {% csrf_token %}
         <p><button id="btn-log" type="submit" class="btn btn-outline-info btn-lg">Создать аккаунт</button></p>
     </form>

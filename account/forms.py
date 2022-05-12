@@ -31,6 +31,7 @@ class UserRegistrationForm(forms.ModelForm):
                 'placeholder': 'Введите ваш комментарий',
             }
         )}
+
     def clean_password2(self):
         cd = self.cleaned_data
         if cd['password'] != cd['password2']:
@@ -40,10 +41,12 @@ class UserRegistrationForm(forms.ModelForm):
 
 class ProfileEdit(forms.ModelForm):
     bio = forms.CharField(label='Расскажите о себе', required=False, widget=forms.Textarea())
+    username = forms.CharField()
+    email = forms.CharField(widget=forms.EmailInput())
 
     class Meta:
         model = Profile
-        fields = ('bio',)
+        fields = ('bio', 'username', 'email')
 
 
 class UserEdit(forms.ModelForm):
