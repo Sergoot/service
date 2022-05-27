@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Training, Exercise
+from .models import Training, Exercise, UserExercises
 
 
 class  TrainingAdmin(admin.ModelAdmin):
@@ -9,4 +9,5 @@ class  TrainingAdmin(admin.ModelAdmin):
 
 admin.site.register(Training, TrainingAdmin)
 admin.site.register(Exercise)
+admin.site.register(UserExercises)
 # Register your models here.

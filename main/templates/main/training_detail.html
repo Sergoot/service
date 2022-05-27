@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+</head>
+<body>
+
+<h1>{{training}} {{training.pub_date}}</h1>
+<h3>Упражнения:</h3>
+
+{% for ex in training.exercises.all %}
+    {{ex}}<br>
+{% endfor %}
+
+<script>
+
+       $(function(){
+            $('#like_btn').on('click',function(){
+                $.ajax({
+                url: '{% url 'like' training.id %}',
+                data: $('#like_btn').serialize(),
+                method: 'get',
+                success: function(data){
+                    console.log(data);
+                    document.getElementById('like_btn').innerHTML = data.response
+                    document.getElementById('total_likes').innerHTML = data.total_likes
+                }
+            });
+                return false;
+            });
+        });
+
+        $(function(){
+            $('#comment_form').on('submit', function(){
+                $.ajaxSetup({data: {csrfmiddlewaretoken: '{{ csrf_token }}'}});
+                $.ajax({
+                url: '{% url 'comment' train_id=training.id %}',
+                data: $('#comment_form').serialize(),
+                method: 'post',
+                success: function(data){
+                    console.log(data);
+                    $('#comments-list').append('<div class="comments">' + '<p>' + '<font size="5" color="#fa8e47" face="sans-serif">' + '<b>' + data.user + '</b>' + '</font>' + '</p>' + '<p>' + '<font face="sans-serif">'+ data.text + '</font>' + '</p>' + '</div>')
+                     $('#form').trigger('reset');
+                }
+            });
+                return false;
+            });
+        });
+    </script>
+<button id='like_btn'type="button">{{like_content}}</button>
+<span id="total_likes">{{ training.total_likes }}</span>
+
+<div id="comments-list">
+    {% for comment in training.comments.all %}
+    <div class="comment">
+        <p><font size="5" color="#fa8e47" face="sans-serif"><b>{{comment.user}}</b></font></p>
+        <p><font face="sans-serif">{{comment.text}}</font></p>
+        </div>
+    {% endfor %}
+</div>
+<form id='comment_form' action="." method="post">
+    {% csrf_token %}
+    {{comment_form.text}}
+    <input type="submit">
+</form>
+
+</body>
+</html>

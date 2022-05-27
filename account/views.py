@@ -7,8 +7,8 @@ from django.views.decorators.http import require_POST
 from django.views.generic import DetailView, UpdateView, CreateView
 
 from main.forms import TrainingForm, ExerciseForm
-from main.models import Exercise, Training
-from .forms import LoginForm, UserRegistrationForm, ProfileEdit, UserEdit
+from main.models import Exercise, Training, UserExercises
+from .forms import LoginForm, UserRegistrationForm, ProfileEdit
 from django.contrib.auth import logout
 from main import views as vmain
 from .models import Profile
@@ -44,17 +44,20 @@ def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         if user_form.is_valid():
-            #создание нового пользователя
+            # создание нового пользователя
             new_user = user_form.save(commit=False)
-            # mail(new_user.email)
+            mail(new_user.email)
             # send_greetings_email.delay(new_user.email)
             print(new_user.email)
-            #Сохранение пароля
+            # Сохранение пароля
             new_user.set_password(user_form.cleaned_data['password'])
             # Сохранение нового пользователя
             new_user.save()
-
-            #Создание профиля нового пользователя
+            # Создание таблицы пользователь - любимые упражнения
+            user_exs = UserExercises()
+            user_exs.user = new_user
+            user_exs.save()
+            # Создание профиля нового пользователя
             profile = Profile()
             profile.user = new_user
             profile.save()
@@ -103,7 +106,6 @@ def profile(request, profile_slug):
 
     if request.user.username != profile_slug:
         return render(request, 'account/user_profile_guest.html', context)
-
     return render(request, 'account/user_profile.html', context)
 
 
@@ -130,6 +132,7 @@ class EditProfile(UpdateView):
         self.object.refresh_from_db()
         self.object.user.username = form.cleaned_data['username']
         self.object.user.email = form.cleaned_data['email']
+        self.object.bio = form.cleaned_data['bio']
         self.object.user.save()
         self.object.save()
         return redirect(f'/account/{self.object.user.username}')

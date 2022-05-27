@@ -1,6 +1,7 @@
+
 from django.db import models
 from django.contrib.auth.models import User
-# Create your models here.
+
 from django.utils.text import slugify
 
 
@@ -23,3 +24,8 @@ class Profile(models.Model):
 
     def get_absolute_url(self):
         return f'/account/{self.slug}'
+
+
+
+
+
