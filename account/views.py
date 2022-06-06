@@ -44,10 +44,10 @@ def register(request):
     if request.method == 'POST':
         user_form = UserRegistrationForm(request.POST)
         if user_form.is_valid():
-            # создание нового пользователя
+            # создание нового пользовател
             new_user = user_form.save(commit=False)
-            mail(new_user.email)
-            # send_greetings_email.delay(new_user.email)
+
+            send_greetings_email.delay(new_user.email)
             print(new_user.email)
             # Сохранение пароля
             new_user.set_password(user_form.cleaned_data['password'])
@@ -65,7 +65,6 @@ def register(request):
     else:
         user_form = UserRegistrationForm()
     return render(request, 'account/1index.html', {'user_form': user_form})
-
 
 # class ShowProfilePageView(DetailView):
 #     template_name = 'account/user_profile.html'

@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'muscles_service.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'muscle_db_',
+        'USER': 'user_name',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
@@ -145,3 +149,4 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_TIME_LIMIT = 30 * 60
 CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_ACCEPT_CONTENT = ['json','application/text']
