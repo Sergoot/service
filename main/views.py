@@ -1,26 +1,22 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_POST
-from django.views.generic import CreateView, DeleteView, DetailView, UpdateView
+from django.views.generic import CreateView, DetailView, UpdateView
 from account.service import get_exercises
-from .forms import TrainingForm, ExerciseForm, CommentForm
-from .models import Exercise, Training, UserExercises, Comment
-# from .forms import TrainingForm
+from .forms import TrainingForm, CommentForm
+from .models import Exercise, Training, UserExercises
 from .service import get_subscriptions, add_like, remove_like, is_fan
 
-
-# Create your views here.
-
-
 def main(request):
+    """ Главная страница """
     request.session['from_ex'] = False
     context = {'training': get_subscriptions(request)}
     return render(request, 'main/main.html', context)
 
 
 def training_create(request):
+    """ Создание тренировки """
     form = TrainingForm(user=request.user, data=request.POST)
     print(request.POST)
     if form.is_valid():
@@ -32,6 +28,7 @@ def training_create(request):
 
 
 class TrainingDelete(View):
+    """ Удаление тренировки """
     model = Training
     success_url = 'account:user_profile'
 
@@ -42,6 +39,7 @@ class TrainingDelete(View):
 
 
 class ExerciseCreate(CreateView):
+    """ Создание тренировки """
     model = Exercise
     template_name = 'account/user_profile.html'
     fields = ['title', 'weight', 'approaches', 'repetition', 'muscle_category', 'is_private']
@@ -67,6 +65,7 @@ class ExerciseCreate(CreateView):
 
 
 def exercise_favorites(request, ex_id):
+    """ Любимые упражнения """
     exercise = Exercise.objects.get(pk=ex_id)
     user_favorites = UserExercises.objects.get(user=request.user)
     if exercise in user_favorites.exercises.all():
@@ -77,10 +76,9 @@ def exercise_favorites(request, ex_id):
         user_favorites.save()
         return JsonResponse({'response': '&#9733;'})
 
-    # return redirect('account:user_profile', request.user.username)
-
 
 class DetailTraining(DetailView):
+    """ Сраница тренировки """
     model = Training
     context_object_name = 'training'
     template_name = 'main/training_detail.html'
@@ -96,25 +94,8 @@ class DetailTraining(DetailView):
         return context
 
 
-# def exercise_edit(request, ex_id):
-#     editing_exercise = Exercise.objects.get(pk=ex_id)
-#     if request.method == 'GET':
-#         exercise_form = ExerciseForm(instance=editing_exercise)
-#         return JsonResponse({'exercise_form': str(exercise_form)}, safe=False)
-#     else:
-#         exercise_form = ExerciseForm(request.POST)
-#         if exercise_form.is_valid():
-#             exercise = exercise_form.save(commit=False)
-#             exercise.save()
-#             user_favorites = UserExercises.objects.get(user=request.user)  # СИЛЬНО ОПТИМИЗИРОВАТЬ!!!!
-#             user_favorites.exercises.remove(editing_exercise)
-#             request.user.favorite_exercises.get().exercises.add(exercise)
-#             request.user.favorite_exercises.get().save()
-#             print(exercise)
-#         return JsonResponse({'exercise_form': str(exercise_form)},safe=False)
-
-
 class EditExercise(UpdateView):
+    """ Изменение упражнения """
     model = Exercise
     pk_url_kwarg = 'ex_id'
     template_name = 'main/exercise_edit.html'
@@ -138,7 +119,7 @@ class EditExercise(UpdateView):
 
 
 def like(request, train_id):
-
+    """ Лайкает/снимает лайк с тренировки """
     obj = get_object_or_404(Training, pk=train_id)
     if is_fan(obj, request.user):
         remove_like(obj, request.user)
@@ -153,6 +134,7 @@ def like(request, train_id):
 
 @require_POST
 def add_comment(request, train_id):
+    """ Комментирует тренировку """
     training = get_object_or_404(Training, pk=train_id)
     form = CommentForm(data=request.POST)
     if form.is_valid():

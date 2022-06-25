@@ -1,20 +1,25 @@
 from django.core.mail import send_mail
 from django.conf import settings
+from django.db.models.base import Model
+from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
 from account.models import Profile
 from main.forms import TrainingForm, ExerciseForm, CommentForm
 from main.models import Training
 
 
-def mail(email):
+def mail(email: str) -> None:
+    """ Отправляет приветственный email """
     subject = 'Спасибо за регистрацию!!'
-    message = ' Всё работает :) '
+    message = ' Добро пожаловать в Muscles Service '
     email_from = settings.EMAIL_HOST_USER
     send_mail(subject, message, email_from, [email], fail_silently=False)
 
 
-def get_profile_context(request, profile_slug):
-
+def get_profile_context(request, profile_slug: str):
+    """ Вовзращает контекст для профиля """
+    print(type(request))
+    print(type(profile_slug))
     profile = get_object_or_404(Profile, slug=profile_slug)
     trainings = Training.objects.filter(user=request.user).order_by('-pub_date')[:5]
     training_form = TrainingForm(user=request.user)
@@ -32,18 +37,25 @@ def get_profile_context(request, profile_slug):
     return context
 
 
-def create_exercise_form_save(request_post):
+def get_all_or_filter(model: Model, **filters: any) -> QuerySet:
+    """ Возвращает QuerySet со всеми атрибутами модели или отфильтрованными по фильтрам атрибутами """
+    return model.objects.filter(**filters) if filters else model.objects.all()
+
+
+def create_exercise_form_save(request_post) -> None:
+    """ Создает ExerciseForm """
     create_exercise_form = ExerciseForm(request_post)
     if create_exercise_form.is_valid():
         create_exercise_form.save()
 
 
-def get_exercises(request, cleaned_data):
+def get_exercises(request, cleaned_data) -> None:
+    """ Получает упражнения в зависимости от содержимого cleaned_data """
     new_training = Training.objects.create(
             title=cleaned_data['title'],
             user=request.user,
         )
-    if cleaned_data['private_exercises']:             ##'''МОЖНО КАК ТО СОКРАТИТЬ'''
+    if cleaned_data['private_exercises']:
         for ex in cleaned_data['private_exercises']:
             ex.popularity += 1
             ex.save()

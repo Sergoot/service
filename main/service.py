@@ -5,6 +5,7 @@ from main.models import Training, Like
 
 
 def get_subscriptions(request) -> list:
+    """ Получает тренировки из подписок """
     all_trains = []
     for subscription in request.user.subscriptions.all():
         sub_user_trainings = Training.objects.filter(user=subscription.user).order_by('-pub_date')
@@ -13,7 +14,6 @@ def get_subscriptions(request) -> list:
     return all_trains
 
 
-# Логика, связанная с лайками
 def add_like(obj, user):
     """ Добавляет лайк к obj. """
     obj_type = ContentType.objects.get_for_model(obj)

@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django import forms
-from django.forms import TextInput, fields_for_model
+from django.forms import TextInput, fields_for_model, EmailInput
 
 from .models import Profile
 
@@ -29,9 +29,15 @@ class UserRegistrationForm(forms.ModelForm):
             attrs={
                 'class': 'form-control',
                 'placeholder': 'Введите ваш комментарий',
-            }
-        )}
-
+            },
+        ),
+            'email': EmailInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Введите вашу почту',
+                },
+            )
+        }
     def clean_password2(self):
         cd = self.cleaned_data
         if cd['password'] != cd['password2']:
